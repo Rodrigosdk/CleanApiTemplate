@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="UNKNOWN_ERROR" xml:space="preserve">
+        <value>Ocorreu um erro inesperado. Tente novamente mais tarde.</value>
+    </data>
+    <data name="INVALID_EMAIL" xml:space="preserve">
+        <value>E-mail inválido.</value>
+    </data>
+    <data name="CONCURRENCY_CONFLICT" xml:space="preserve">
+        <value>O registro foi alterado por outra operação. Consulte novamente e repita a solicitação.</value>
+    </data>
+    <data name="INVALID_REQUEST" xml:space="preserve">
+        <value>A requisição é inválida. Verifique o formato e os campos enviados.</value>
+    </data>
+    <data name="INVALID_PAGE" xml:space="preserve">
+        <value>A página deve ser maior ou igual a 1.</value>
+    </data>
+    <data name="INVALID_PAGE_SIZE" xml:space="preserve">
+        <value>O tamanho da página deve estar entre 1 e {0}.</value>
+    </data>
+    <data name="MISSING_CONNECTION_STRING" xml:space="preserve">
+        <value>ConnectionStrings:DbConnection não configurada. Informe-a via User Secrets (dotnet user-secrets set "ConnectionStrings:DbConnection" "...") ou pela variável de ambiente ConnectionStrings__DbConnection.</value>
+    </data>
+</root>
