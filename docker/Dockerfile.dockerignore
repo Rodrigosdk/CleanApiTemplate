@@ -1,0 +1,7 @@
+.git
+.idea
+**/bin
+**/obj
+**/.vs
+**/.vscode
+Template.sln.DotSettings.user
