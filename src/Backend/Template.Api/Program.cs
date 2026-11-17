@@ -1,0 +1,83 @@
+using System.Globalization;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Localization;
+using Template.Api.Converters;
+using Template.Api.Errors;
+using Template.Api.Filters;
+using Template.Api.Observability;
+using Template.Application;
+using Template.Infrastructure;
+using Template.Infrastructure.DataAccess.Migrations;
+
+var builder = WebApplication.CreateBuilder(args);
+
+const long maxRequestBodySizeInBytes = 64 * 1024;
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = maxRequestBodySizeInBytes);
+
+builder.Services.AddErrorHandling();
+
+builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>()).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new StringConverter());
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+builder.Services.AddOpenApi();
+
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new List<CultureInfo>
+    {
+        new("pt-BR"),
+        new("en")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("pt-BR");
+    
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    options.RequestCultureProviders = [new AcceptLanguageHeaderRequestCultureProvider()];
+});
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+var app = builder.Build();
+
+// Ordem: o cabeçalho de correlação e o log de requisições envolvem o tratamento de erros,
+// para que o status final (inclusive 500) apareça no log e o X-Trace-Id vá em toda resposta
+app.UseCorrelationIdHeader();
+app.UseErrorHandling();
+
+app.UseRequestLocalization();
+
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
+{
+    app.MapOpenApi().AllowAnonymous();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Template API"));
+    app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription().AllowAnonymous();
+}
+
+app.UseHttpsRedirection();
+
+
+app.MapControllers();
+app.MapHealthChecks("/health").AllowAnonymous();
+
+if (!app.Environment.IsProduction())
+{
+    await ExecuteMigrationsAsync();
+}
+
+app.Run();
+
+async Task ExecuteMigrationsAsync()
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    
+    await DatabaseMigration.ExecuteMigrationsAsync(scope.ServiceProvider);
+}
+
+public partial class Program { }
