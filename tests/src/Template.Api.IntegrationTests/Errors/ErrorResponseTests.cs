@@ -1,0 +1,140 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
+using Template.Api.Errors;
+using Template.Api.IntegrationTests.Support;
+using Template.Exception;
+using Template.Exception.Exception;
+using Shouldly;
+
+namespace Template.Api.IntegrationTests.Errors;
+
+public class ErrorResponseTests(TemplateApplicationFactory factory) : IClassFixture<TemplateApplicationFactory>
+{
+    private const string ProblemJson = "application/problem+json";
+
+    [Fact(DisplayName = nameof(Deve_RetornarProblemDetailsComMensagem_Quando_RegraDeDominioForViolada))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarProblemDetailsComMensagem_Quando_RegraDeDominioForViolada()
+    {
+        var client = CreateClientThrowing(new DomainRuleException("Regra de negócio violada"));
+
+        var response = await client.GetAsync(TestController.ThrowUri);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.BadRequest);
+        Errors(problem).ShouldBe(["Regra de negócio violada"]);
+    }
+
+    [Fact(DisplayName = nameof(Deve_RetornarTodosOsErros_Quando_ValidacaoFalharComVariasMensagens))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarTodosOsErros_Quando_ValidacaoFalharComVariasMensagens()
+    {
+        var client = CreateClientThrowing(new ErrorOnValidationException(["Primeiro erro", "Segundo erro"]));
+
+        var response = await client.GetAsync(TestController.ThrowUri);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.BadRequest);
+        Errors(problem).ShouldBe(["Primeiro erro", "Segundo erro"]);
+    }
+
+    [Fact(DisplayName = nameof(Deve_RetornarNotFoundNoMesmoFormato_Quando_RecursoNaoExistir))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarNotFoundNoMesmoFormato_Quando_RecursoNaoExistir()
+    {
+        var client = CreateClientThrowing(new NotFoundException("Recurso não encontrado"));
+
+        var response = await client.GetAsync(TestController.ThrowUri);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.NotFound);
+        Errors(problem).ShouldBe(["Recurso não encontrado"]);
+    }
+
+    [Fact(DisplayName = nameof(Deve_RetornarConflictNoMesmoFormato_Quando_HouverConflitoDeConcorrencia))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarConflictNoMesmoFormato_Quando_HouverConflitoDeConcorrencia()
+    {
+        var client = CreateClientThrowing(new ConflictException(ResourcesMessageException.CONCURRENCY_CONFLICT));
+
+        var response = await client.GetAsync(TestController.ThrowUri);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.Conflict);
+        Errors(problem).ShouldBe([ResourcesMessageException.CONCURRENCY_CONFLICT]);
+    }
+
+    [Fact(DisplayName = nameof(Deve_RetornarListaDeErros_Quando_CorpoDaRequisicaoForMalformado))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarListaDeErros_Quando_CorpoDaRequisicaoForMalformado()
+    {
+        using var body = new StringContent("{ \"quantidade\": \"não é número\" ", Encoding.UTF8, "application/json");
+
+        var response = await factory.CreateClient().PostAsync(TestController.BodyUri, body);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.BadRequest);
+        Errors(problem).ShouldContain(error => error.Contains("quantidade"));
+    }
+
+    [Fact(DisplayName = nameof(Deve_RetornarProblemDetails_Quando_RotaNaoExistir))]
+    [Trait("Integration", "Erros - Formato único")]
+    public async Task Deve_RetornarProblemDetails_Quando_RotaNaoExistir()
+    {
+        var response = await factory.CreateClient().GetAsync("/api/rota-inexistente");
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.NotFound);
+        Errors(problem).ShouldNotBeEmpty();
+    }
+
+    [Fact(DisplayName = nameof(Deve_RegistrarLogDeErroSemExporDetalhes_Quando_OcorrerErroInesperado))]
+    [Trait("Integration", "Erros - Log de 500")]
+    public async Task Deve_RegistrarLogDeErroSemExporDetalhes_Quando_OcorrerErroInesperado()
+    {
+        const string internalDetail = "detalhe interno que não pode vazar";
+        var app = factory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+        {
+            services.AddFakeLogging();
+            services.AddSingleton(new ExceptionToThrow(new InvalidOperationException(internalDetail)));
+        }));
+
+        var response = await app.CreateClient().GetAsync(TestController.ThrowUri);
+
+        var problem = await ShouldBeProblem(response, HttpStatusCode.InternalServerError);
+        Errors(problem).ShouldBe([ResourcesMessageException.UNKNOWN_ERROR]);
+        problem.GetRawText().ShouldNotContain(internalDetail);
+
+        var errorLog = app.Services.GetFakeLogCollector().GetSnapshot()
+            .Single(record => record.Level == LogLevel.Error && record.Category == "Template.Api.Filters.ExceptionFilter");
+        errorLog.Exception.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe(internalDetail);
+        errorLog.Id.Id.ShouldBe(9001);
+    }
+
+    // Garante o formato: content type, status, lista "errors" e traceId igual ao cabeçalho de correlação
+    private static async Task<JsonElement> ShouldBeProblem(HttpResponseMessage response, HttpStatusCode expectedStatus)
+    {
+        response.StatusCode.ShouldBe(expectedStatus);
+        response.Content.Headers.ContentType?.MediaType.ShouldBe(ProblemJson);
+
+        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+        problem.EnumerateObject().Count(property => property.Name == ProblemDetailsSetup.ErrorsKey).ShouldBe(1);
+        problem.GetProperty("status").GetInt32().ShouldBe((int)expectedStatus);
+        problem.GetProperty(ProblemDetailsSetup.ErrorsKey).ValueKind.ShouldBe(JsonValueKind.Array);
+
+        var traceId = problem.GetProperty(ProblemDetailsSetup.TraceIdKey).GetString();
+        traceId.ShouldNotBeNullOrWhiteSpace();
+        response.Headers.GetValues("X-Trace-Id").Single().ShouldBe(traceId);
+
+        return problem;
+    }
+
+    private static List<string> Errors(JsonElement problem) =>
+        problem.GetProperty(ProblemDetailsSetup.ErrorsKey).EnumerateArray().Select(error => error.GetString()!).ToList();
+
+    private HttpClient CreateClientThrowing(System.Exception exception) =>
+        factory
+            .WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+                services.AddSingleton(new ExceptionToThrow(exception))))
+            .CreateClient();
+}
