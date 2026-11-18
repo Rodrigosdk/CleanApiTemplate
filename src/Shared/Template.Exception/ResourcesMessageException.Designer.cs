@@ -86,5 +86,58 @@ namespace Template.Exception {
                 return ResourceManager.GetString("MISSING_CONNECTION_STRING", resourceCulture);
             }
         }
+        public static string USER_NAME_REQUIRED {
+            get {
+                return ResourceManager.GetString("USER_NAME_REQUIRED", resourceCulture);
+            }
+        }
+
+        public static string USER_NAME_TOO_LONG {
+            get {
+                return ResourceManager.GetString("USER_NAME_TOO_LONG", resourceCulture);
+            }
+        }
+
+        public static string USER_PASSWORD_REQUIRED {
+            get {
+                return ResourceManager.GetString("USER_PASSWORD_REQUIRED", resourceCulture);
+            }
+        }
+
+        public static string USER_PASSWORD_TOO_SHORT {
+            get {
+                return ResourceManager.GetString("USER_PASSWORD_TOO_SHORT", resourceCulture);
+            }
+        }
+
+        public static string USER_ACTIVE_EMAIL_EXISTS {
+            get {
+                return ResourceManager.GetString("USER_ACTIVE_EMAIL_EXISTS", resourceCulture);
+            }
+        }
+
+        public static string USER_INVALID_CREDENTIALS {
+            get {
+                return ResourceManager.GetString("USER_INVALID_CREDENTIALS", resourceCulture);
+            }
+        }
+
+        public static string INVALID_JWT_CONFIGURATION {
+            get {
+                return ResourceManager.GetString("INVALID_JWT_CONFIGURATION", resourceCulture);
+            }
+        }
+
+        public static string AUTHENTICATION_REQUIRED {
+            get {
+                return ResourceManager.GetString("AUTHENTICATION_REQUIRED", resourceCulture);
+            }
+        }
+
+        public static string USER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("USER_NOT_FOUND", resourceCulture);
+            }
+        }
     }
 }
