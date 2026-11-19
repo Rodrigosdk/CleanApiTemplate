@@ -1,5 +1,6 @@
 using CommonTestUtilities.Entities;
 using CommonTestUtilities.Generators;
+using CommonTestUtilities.Loggers;
 using CommonTestUtilities.Repositories.Users;
 using CommonTestUtilities.Requests;
 using CommonTestUtilities.Security;
@@ -95,6 +96,7 @@ public class LoginUseCaseTests
         return new LoginUseCase(
             usersReadOnlyRepositoryBuilder.Build(),
             passwordHashingBuilder.Build(),
-            AccessTokenGeneratorBuilder.Build());
+            AccessTokenGeneratorBuilder.Build(),
+            LoggerBuilder.Build<LoginUseCase>());
     }
 }

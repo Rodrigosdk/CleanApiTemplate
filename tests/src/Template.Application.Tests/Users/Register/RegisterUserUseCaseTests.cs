@@ -1,3 +1,4 @@
+using CommonTestUtilities.Loggers;
 using CommonTestUtilities.Repositories;
 using CommonTestUtilities.Repositories.Users;
 using CommonTestUtilities.Requests;
@@ -134,6 +135,7 @@ public class RegisterUserUseCaseTests
             UsersWriteOnlyRepositoryBuilder.Build(),
             usersReadOnlyRepositoryBuilder.Build(),
             new PasswordHashingBuilder().Build(),
-            UnitOfWorkBuilder.Build());
+            UnitOfWorkBuilder.Build(),
+            LoggerBuilder.Build<RegisterUserUseCase>());
     }
 }
