@@ -23,4 +23,10 @@ public class FieldLimitsTests
         FieldLimits.Exceeds("aaaaaa", 5).ShouldBeTrue();
     }
 
+    [Fact(DisplayName = nameof(Deve_InformarOLimiteNaMensagem_Quando_NomeDoUsuarioForLongoDemais))]
+    [Trait("Domain", "FieldLimits - Mensagens")]
+    public void Deve_InformarOLimiteNaMensagem_Quando_NomeDoUsuarioForLongoDemais()
+    {
+        FieldLimits.UserNameTooLong.ShouldContain(FieldLimits.UserName.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
 }

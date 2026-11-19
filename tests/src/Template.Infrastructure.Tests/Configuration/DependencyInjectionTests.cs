@@ -1,8 +1,10 @@
+using CommonTestUtilities.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using Template.Exception;
+using Template.Infrastructure.Configuration;
 using Template.Infrastructure.DataAccess;
 using Shouldly;
 
@@ -69,12 +71,37 @@ public class DependencyInjectionTests
         provider.GetRequiredService<TimeProvider>().ShouldBeSameAs(TimeProvider.System);
     }
 
+    [Theory(DisplayName = nameof(Deve_FalharNaInicializacao_Quando_ChaveDoJwtForAusenteOuCurta))]
+    [Trait("Infrastructure", "Configuração - Jwt")]
+    [InlineData("")]
+    [InlineData("chave-curta")]
+    [InlineData("1234567890123456789012345678901")]
+    public void Deve_FalharNaInicializacao_Quando_ChaveDoJwtForAusenteOuCurta(string signingKey)
+    {
+        using var provider = BuildProvider(ValidConnectionString, jwtOptions: JwtOptionsBuilder.Build(signingKey));
+
+        var exception = Should.Throw<OptionsValidationException>(
+            () => provider.GetRequiredService<IStartupValidator>().Validate());
+
+        exception.Message.ShouldContain("Jwt__SigningKey");
+    }
+
+    [Fact(DisplayName = nameof(Deve_PassarNaValidacaoDeInicializacao_Quando_ChaveDoJwtTiverTamanhoMinimo))]
+    [Trait("Infrastructure", "Configuração - Jwt")]
+    public void Deve_PassarNaValidacaoDeInicializacao_Quando_ChaveDoJwtTiverTamanhoMinimo()
+    {
+        var signingKey = new string('a', JwtOptions.MinimumSigningKeyBytes);
+        using var provider = BuildProvider(ValidConnectionString, jwtOptions: JwtOptionsBuilder.Build(signingKey));
+
+        Should.NotThrow(() => provider.GetRequiredService<IStartupValidator>().Validate());
+    }
 
     private static ServiceProvider BuildProvider(
         string? connectionString,
-        Action<IServiceCollection>? configureServices = null)
+        Action<IServiceCollection>? configureServices = null,
+        JwtOptions? jwtOptions = null)
     {
-        var settings = new Dictionary<string, string?>();
+        var settings = JwtOptionsBuilder.Settings(jwtOptions ?? JwtOptionsBuilder.Build());
         settings["ConnectionStrings:DbConnection"] = connectionString;
 
         var configuration = new ConfigurationBuilder()
