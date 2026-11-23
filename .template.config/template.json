@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Rodrigo",
+  "classifications": [
+    "Web",
+    "WebAPI",
+    "Clean Architecture",
+    "PostgreSQL"
+  ],
+  "identity": "Rodrigosdk.CleanApi",
+  "name": "Clean Architecture Web API (.NET 10 + PostgreSQL + JWT)",
+  "description": "API REST em camadas (Api, Application, Domain, Infrastructure, Communication, Exception) com usuários e JWT, ProblemDetails, OpenTelemetry, Docker, CI e testes com Testcontainers.",
+  "shortName": "cleanapi",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Template",
+  "preferNameDirectory": true,
+  "guids": [
+    "EB66D4E0-1CA7-4371-A1CF-1D834EAC719F",
+    "44D9BDCC-D9F7-4A45-A4D0-7098E1C9A91E",
+    "E5670446-D33C-41C0-87C5-AD2D79176A51",
+    "38CE30A0-051F-4A46-8E9E-5178E58369B1",
+    "9F8BB7C0-421B-41A2-ADCC-0FF48FE3B954",
+    "CA6DD575-E9F2-4E6A-B700-C47C1D6E0779",
+    "AD8EF7B1-0838-4906-A743-64560EC17816",
+    "A5E931F5-68B5-4A00-850A-C10ED2EF6069",
+    "C394FDC5-08A7-4FF4-9C96-93392C69F3FD",
+    "3C5B0E3B-45F8-41A0-AD67-964C3DFA6E42",
+    "D31992DF-7480-4F9F-BD6F-5AB133DAB0C7",
+    "3DC188C8-F206-4CD3-9118-FB810F42F20F",
+    "B8145FAC-DE6A-4785-84A2-497C549BE1B6",
+    "F6A11A8C-6806-4654-AB53-8F068A81C754",
+    "67D37940-B6DA-41C9-AE92-A5779A0AAB94",
+    "7B1C2D3E-4F50-4A61-8B72-9C83D4E5F601",
+    "96af9c62-c157-4d99-92bb-5e10b29e5064"
+  ],
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            ".git/**",
+            ".idea/**",
+            ".vs/**",
+            ".template.config/**",
+            "TEMPLATE.md",
+            "**/bin/**",
+            "**/obj/**",
+            "**/TestResults/**",
+            "**/*.DotSettings.user"
+          ]
+        }
+      ]
+    }
+  ]
+}
