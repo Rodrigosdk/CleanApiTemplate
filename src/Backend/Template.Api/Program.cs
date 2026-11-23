@@ -6,7 +6,9 @@ using Template.Api.Errors;
 using Template.Api.Filters;
 using Template.Api.Logging;
 using Template.Api.Observability;
+#if (auth)
 using Template.Api.Security;
+#endif
 using Template.Application;
 using Template.Infrastructure;
 using Template.Infrastructure.DataAccess.Migrations;
@@ -25,15 +27,21 @@ builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>(
     options.JsonSerializerOptions.Converters.Add(new StringConverter());
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+#if (auth)
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecurityTransformer>();
     options.AddOperationTransformer<BearerSecurityTransformer>();
 });
+#else
+builder.Services.AddOpenApi();
+#endif
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+#if (auth)
 builder.Services.AddJwtAuthentication();
+#endif
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
@@ -72,8 +80,10 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger
 
 app.UseHttpsRedirection();
 
+#if (auth)
 app.UseAuthentication();
 app.UseAuthorization();
+#endif
 
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();

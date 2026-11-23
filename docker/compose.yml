@@ -24,7 +24,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DbConnection: Host=db;Port=5432;Database=Template;Username=admin;Password=${DB_PASSWORD:-template-local}
+#if (auth)
       Jwt__SigningKey: ${JWT_SIGNING_KEY:-template-local-jwt-signing-key-change-me}
+#endif
     ports:
       - "8080:8080"
     depends_on:

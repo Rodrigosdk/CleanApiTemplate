@@ -7,6 +7,7 @@ namespace Template.Application.Logging;
 // Reserve uma faixa de EventId para cada contexto (ex.: 1xxx usuários).
 internal static partial class ApplicationLogs
 {
+#if (auth)
     // Usuários
 
     [LoggerMessage(EventId = 1001, Level = LogLevel.Information, Message = "Usuário {UserId} cadastrado")]
@@ -17,4 +18,5 @@ internal static partial class ApplicationLogs
 
     [LoggerMessage(EventId = 1003, Level = LogLevel.Warning, Message = "Tentativa de login com credenciais inválidas")]
     public static partial void UserLoginFailed(this ILogger logger);
+#endif
 }

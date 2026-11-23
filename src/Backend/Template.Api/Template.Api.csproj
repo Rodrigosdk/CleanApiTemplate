@@ -5,7 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!--#if (auth) -->
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <!--#endif -->
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
           <PrivateAssets>all</PrivateAssets>

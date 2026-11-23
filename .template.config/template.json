@@ -8,8 +8,8 @@
     "PostgreSQL"
   ],
   "identity": "Rodrigosdk.CleanApi",
-  "name": "Clean Architecture Web API (.NET 10 + PostgreSQL + JWT)",
-  "description": "API REST em camadas (Api, Application, Domain, Infrastructure, Communication, Exception) com usuários e JWT, ProblemDetails, OpenTelemetry, Docker, CI e testes com Testcontainers.",
+  "name": "Clean Architecture Web API (.NET 10)",
+  "description": "API REST em camadas (Api, Application, Domain, Infrastructure, Communication, Exception) com ProblemDetails, EF Core, Docker, CI e testes com Testcontainers; autenticação JWT, logging e observabilidade escolhidos na geração.",
   "shortName": "cleanapi",
   "tags": {
     "language": "C#",
@@ -51,8 +51,106 @@
             "**/TestResults/**",
             "**/*.DotSettings.user"
           ]
+        },
+        {
+          "condition": "(!auth)",
+          "exclude": [
+            "src/Backend/Template.Infrastructure/DataAccess/Migrations/2*.cs",
+            "src/Backend/Template.Infrastructure/DataAccess/Migrations/TemplateDbContextModelSnapshot.cs"
+          ]
+        },
+        {
+          "condition": "(!auth)",
+          "exclude": [
+            "src/Backend/Template.Api/Controllers/AuthenticationController.cs",
+            "src/Backend/Template.Api/Controllers/UsersController.cs",
+            "src/Backend/Template.Api/Security/**",
+            "src/Backend/Template.Application/Users/**",
+            "src/Backend/Template.Domain/Entities/User.cs",
+            "src/Backend/Template.Domain/Repositories/Users/**",
+            "src/Backend/Template.Domain/Security/**",
+            "src/Backend/Template.Infrastructure/Configuration/JwtOptions.cs",
+            "src/Backend/Template.Infrastructure/DataAccess/Mappings/UserMap.cs",
+            "src/Backend/Template.Infrastructure/DataAccess/Repositories/**",
+            "src/Backend/Template.Infrastructure/Security/**",
+            "src/Shared/Template.Communication/Requests/RequestUserJson.cs",
+            "src/Shared/Template.Communication/Requests/RequestLoginJson.cs",
+            "src/Shared/Template.Communication/Responses/ResponseLoginJson.cs",
+            "src/Shared/Template.Communication/Responses/ResponseRegisteredUserJson.cs",
+            "src/Shared/Template.Communication/Responses/ResponseTokenJson.cs",
+            "src/Shared/Template.Communication/Responses/ResponseUserProfileJson.cs",
+            "tests/src/CommonTestUtilities/Entities/**",
+            "tests/src/CommonTestUtilities/Generators/**",
+            "tests/src/CommonTestUtilities/Repositories/Users/**",
+            "tests/src/CommonTestUtilities/Requests/**",
+            "tests/src/CommonTestUtilities/Security/**",
+            "tests/src/Template.Api.IntegrationTests/Authentication/**",
+            "tests/src/Template.Api.IntegrationTests/Users/**",
+            "tests/src/Template.Application.Tests/Users/**",
+            "tests/src/Template.Domain.Tests/Entities/**",
+            "tests/src/Template.Infrastructure.Tests/DatabaseFixture.cs",
+            "tests/src/Template.Infrastructure.Tests/Commit/**",
+            "tests/src/Template.Infrastructure.Tests/Security/**",
+            "tests/src/Template.Infrastructure.Tests/Users/**"
+          ]
         }
       ]
     }
-  ]
+  ],
+  "symbols": {
+    "auth": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Inclui cadastro de usuários, login com JWT (Argon2) e exige token nos endpoints."
+    }
+  },
+  "SpecialCustomOperations": {
+    "**/*.resx": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": [
+              "<!--#if"
+            ],
+            "else": [
+              "<!--#else"
+            ],
+            "elseif": [
+              "<!--#elseif"
+            ],
+            "endif": [
+              "<!--#endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true"
+          }
+        }
+      ]
+    },
+    "**/*.md": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": [
+              "<!--#if"
+            ],
+            "else": [
+              "<!--#else"
+            ],
+            "elseif": [
+              "<!--#elseif"
+            ],
+            "endif": [
+              "<!--#endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true"
+          }
+        }
+      ]
+    }
+  }
 }

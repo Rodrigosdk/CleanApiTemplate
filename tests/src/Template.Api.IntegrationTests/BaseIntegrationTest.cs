@@ -11,14 +11,18 @@ public abstract class BaseIntegrationTest : IClassFixture<TemplateApplicationFac
     protected TemplateApplicationFactory Factory { get; }
 
     private readonly HttpClient _httpClient;
+#if (auth)
     private readonly HttpClient _anonymousClient;
+#endif
     private readonly IServiceScope _scope;
 
     protected BaseIntegrationTest(TemplateApplicationFactory factory)
     {
         Factory = factory;
         _httpClient = factory.CreateClient();
+#if (auth)
         _anonymousClient = factory.CreateAnonymousClient();
+#endif
         _scope = factory.Services.CreateScope();
         DbContext = _scope.ServiceProvider.GetRequiredService<TemplateDbContext>();
     }
@@ -34,6 +38,7 @@ public abstract class BaseIntegrationTest : IClassFixture<TemplateApplicationFac
 
     protected async Task<HttpResponseMessage> Delete(string requestUri) =>
         await _httpClient.DeleteAsync(requestUri);
+#if (auth)
 
     protected void RenewAccessToken() => Factory.Authorize(_httpClient);
 
@@ -42,11 +47,14 @@ public abstract class BaseIntegrationTest : IClassFixture<TemplateApplicationFac
 
     protected async Task<HttpResponseMessage> GetWithoutToken(string requestUri) =>
         await _anonymousClient.GetAsync(requestUri);
+#endif
 
     public void Dispose()
     {
         _httpClient.Dispose();
+#if (auth)
         _anonymousClient.Dispose();
+#endif
         _scope.Dispose();
         DbContext.Dispose();
         GC.SuppressFinalize(this);

@@ -39,6 +39,7 @@
     <data name="MISSING_CONNECTION_STRING" xml:space="preserve">
         <value>ConnectionStrings:DbConnection is not configured. Provide it via User Secrets (dotnet user-secrets set "ConnectionStrings:DbConnection" "...") or the ConnectionStrings__DbConnection environment variable.</value>
     </data>
+    <!--#if (auth) -->
     <data name="USER_NAME_REQUIRED" xml:space="preserve">
         <value>The user name is required.</value>
     </data>
@@ -66,4 +67,5 @@
     <data name="USER_NOT_FOUND" xml:space="preserve">
         <value>User not found.</value>
     </data>
+    <!--#endif -->
 </root>

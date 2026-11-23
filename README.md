@@ -17,12 +17,17 @@
 
 ## 📖 Sobre
 
+<!--#if (auth) -->
 O **Template** é uma API backend gerada a partir do template `cleanapi`. Ela já vem com cadastro de usuários, login com JWT e toda a base de infraestrutura pronta; o domínio de negócio é construído a partir daqui.
+<!--#else -->
+O **Template** é uma API backend gerada a partir do template `cleanapi`. Ela já vem com toda a base de infraestrutura pronta; o domínio de negócio é construído a partir daqui.
+<!--#endif -->
 
 ---
 
 ## ✨ Funcionalidades
 
+<!--#if (auth) -->
 ### 👤 Usuários e autenticação
 - Cadastro de usuário com validação de nome, e-mail e senha (mínimo de 8 caracteres)
 - Senhas armazenadas com **Argon2**
@@ -30,6 +35,7 @@ O **Template** é uma API backend gerada a partir do template `cleanapi`. Ela j�
 - Todos os endpoints exigem token por padrão (*fallback policy*); os públicos usam `[AllowAnonymous]`
 - Perfil do usuário autenticado em `GET /api/usuarios/perfil`
 
+<!--#endif -->
 ### 🧱 Base pronta
 - Tratamento de erros único em **ProblemDetails**, com mensagens localizadas (pt-BR e en)
 - Paginação padronizada (`RequestPaginationJson` / `ResponsePagedJson`)
@@ -161,10 +167,12 @@ docker compose -f docker/compose.yml up -d db
 dotnet user-secrets set "ConnectionStrings:DbConnection" \
   "Host=localhost;Port=5432;Database=Template;Username=admin;Password=template-local" \
   --project src/Backend/Template.Api
+<!--#if (auth) -->
 
 # 3. Configure a chave do JWT (mínimo de 32 bytes)
 dotnet user-secrets set "Jwt:SigningKey" "$(openssl rand -base64 48)" \
   --project src/Backend/Template.Api
+<!--#endif -->
 
 # Execute a API
 dotnet run --project src/Backend/Template.Api
@@ -176,6 +184,7 @@ A API ficará disponível em http://localhost:5045, com o Swagger em http://loca
 
 ## 🔌 Endpoints
 
+<!--#if (auth) -->
 ### Autenticação — `/api/autenticacao`
 
 | Método | Rota | Descrição |
@@ -203,6 +212,12 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/autenticacao/entrar \
 curl http://localhost:8080/api/usuarios/perfil -H "Authorization: Bearer $TOKEN"
 ```
 
+<!--#else -->
+| Método | Rota | Descrição |
+| :---: | --- | --- |
+| `GET` | `/health` | Saúde da API e do banco |
+
+<!--#endif -->
 ### Convenções do contrato
 
 - Campos do JSON em português e em camelCase (`nome`, `tamanhoPagina`, `criadoEm`).
@@ -257,7 +272,11 @@ O mesmo `traceId` volta no cabeçalho `X-Trace-Id` de toda resposta e aparece no
 | --- | --- |
 | `Template.Domain.Tests` | Invariantes das entidades, validadores e exceções |
 | `Template.Application.Tests` | Casos de uso isolados com repositórios simulados (Moq) |
+<!--#if (auth) -->
 | `Template.Infrastructure.Tests` | Configuração, repositórios e Unit of Work contra um **banco real** via Testcontainers |
+<!--#else -->
+| `Template.Infrastructure.Tests` | Configuração da injeção de dependências |
+<!--#endif -->
 | `Template.Api.IntegrationTests` | Requisições HTTP de ponta a ponta, contratos de erro, localização e health check |
 
 ```bash

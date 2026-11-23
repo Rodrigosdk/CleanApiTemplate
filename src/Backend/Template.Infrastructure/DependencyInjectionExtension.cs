@@ -3,15 +3,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Template.Domain.Repositories;
+#if (auth)
 using Template.Domain.Repositories.Users;
 using Template.Domain.Security.PasswordHashing;
 using Template.Domain.Security.Tokens;
+#endif
 using Template.Exception;
 using Template.Infrastructure.Configuration;
 using Template.Infrastructure.DataAccess;
+#if (auth)
 using Template.Infrastructure.DataAccess.Repositories;
 using Template.Infrastructure.Security.PasswordHashing;
 using Template.Infrastructure.Security.Tokens;
+#endif
 
 namespace Template.Infrastructure;
 
@@ -21,16 +25,20 @@ public static class DependencyInjectionExtension
     {
         services.TryAddSingleton(TimeProvider.System);
         AddDatabase(services, configuration);
+#if (auth)
         AddRepositories(services);
         AddSecurity(services, configuration);
+#endif
     }
 
+#if (auth)
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IUsersWriteOnlyRepository, UsersRepository>();
         services.AddScoped<IUsersReadOnlyRepository, UsersRepository>();
         services.AddScoped<IUsersUpdateOnlyRepository, UsersRepository>();
     }
+#endif
     
     private static void AddDatabase(IServiceCollection services,  IConfiguration configuration)
     {
@@ -48,6 +56,7 @@ public static class DependencyInjectionExtension
         services.AddHealthChecks().AddDbContextCheck<TemplateDbContext>("database");
     }
     
+#if (auth)
     private static void AddSecurity(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IPasswordHashing, Argon2PasswordHasher>();
@@ -59,4 +68,5 @@ public static class DependencyInjectionExtension
 
         services.AddSingleton<IAccessTokenGenerator, JwtAccessTokenGenerator>();
     }
+#endif
 }

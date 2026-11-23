@@ -86,6 +86,7 @@ namespace Template.Exception {
                 return ResourceManager.GetString("MISSING_CONNECTION_STRING", resourceCulture);
             }
         }
+#if (auth)
         public static string USER_NAME_REQUIRED {
             get {
                 return ResourceManager.GetString("USER_NAME_REQUIRED", resourceCulture);
@@ -139,5 +140,6 @@ namespace Template.Exception {
                 return ResourceManager.GetString("USER_NOT_FOUND", resourceCulture);
             }
         }
+#endif
     }
 }

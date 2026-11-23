@@ -1,10 +1,14 @@
+#if (auth)
 using CommonTestUtilities.Security;
+#endif
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using Template.Exception;
+#if (auth)
 using Template.Infrastructure.Configuration;
+#endif
 using Template.Infrastructure.DataAccess;
 using Shouldly;
 
@@ -71,6 +75,7 @@ public class DependencyInjectionTests
         provider.GetRequiredService<TimeProvider>().ShouldBeSameAs(TimeProvider.System);
     }
 
+#if (auth)
     [Theory(DisplayName = nameof(Deve_FalharNaInicializacao_Quando_ChaveDoJwtForAusenteOuCurta))]
     [Trait("Infrastructure", "Configuração - Jwt")]
     [InlineData("")]
@@ -95,13 +100,20 @@ public class DependencyInjectionTests
 
         Should.NotThrow(() => provider.GetRequiredService<IStartupValidator>().Validate());
     }
+#endif
 
     private static ServiceProvider BuildProvider(
         string? connectionString,
+#if (auth)
         Action<IServiceCollection>? configureServices = null,
         JwtOptions? jwtOptions = null)
     {
         var settings = JwtOptionsBuilder.Settings(jwtOptions ?? JwtOptionsBuilder.Build());
+#else
+        Action<IServiceCollection>? configureServices = null)
+    {
+        var settings = new Dictionary<string, string?>();
+#endif
         settings["ConnectionStrings:DbConnection"] = connectionString;
 
         var configuration = new ConfigurationBuilder()

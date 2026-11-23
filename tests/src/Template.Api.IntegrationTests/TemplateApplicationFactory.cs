@@ -1,7 +1,11 @@
 using System.Globalization;
+#if (auth)
 using System.Net.Http.Headers;
+#endif
 using CommonTestUtilities.Database;
+#if (auth)
 using CommonTestUtilities.Security;
+#endif
 using CommonTestUtilities.Time;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -9,11 +13,15 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+#if (auth)
 using Microsoft.Extensions.Options;
+#endif
 using Microsoft.Extensions.Time.Testing;
 using Template.Api.IntegrationTests.Support;
+#if (auth)
 using Template.Infrastructure.Configuration;
 using Template.Infrastructure.Security.Tokens;
+#endif
 
 namespace Template.Api.IntegrationTests;
 
@@ -28,6 +36,7 @@ public class TemplateApplicationFactory : WebApplicationFactory<Program>, IAsync
     private readonly TestDatabase _database = new("template_integration_tests");
 
     public FakeTimeProvider Clock { get; } = TimeProviderBuilder.Build();
+#if (auth)
 
     public JwtOptions Jwt { get; } = JwtOptionsBuilder.Build();
 
@@ -54,6 +63,7 @@ public class TemplateApplicationFactory : WebApplicationFactory<Program>, IAsync
         base.ConfigureClient(client);
         Authorize(client);
     }
+#endif
 
     public async Task InitializeAsync() => await _database.StartAsync();
 
@@ -72,7 +82,9 @@ public class TemplateApplicationFactory : WebApplicationFactory<Program>, IAsync
             {
                 ["ConnectionStrings:DbConnection"] = _database.ConnectionString
             });
+#if (auth)
             configuration.AddInMemoryCollection(JwtOptionsBuilder.Settings(Jwt));
+#endif
         });
         builder.ConfigureTestServices(services =>
         {

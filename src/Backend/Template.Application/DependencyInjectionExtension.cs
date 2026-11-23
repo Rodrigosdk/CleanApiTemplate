@@ -1,8 +1,10 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
+#if (auth)
 using Template.Application.Users.Login;
 using Template.Application.Users.Profile;
 using Template.Application.Users.Register;
+#endif
 
 [assembly: InternalsVisibleTo("Template.Application.Tests")]
 
@@ -12,8 +14,10 @@ public static class DependencyInjectionExtension
 {
     public static void AddApplication(this IServiceCollection services)
     {
+#if (auth)
         services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         services.AddScoped<ILoginUseCase, LoginUseCase>();
         services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
+#endif
     }
 }

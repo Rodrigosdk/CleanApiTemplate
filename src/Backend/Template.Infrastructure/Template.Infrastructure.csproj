@@ -5,8 +5,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <!--#if (auth) -->
       <PackageReference Include="Konscious.Security.Cryptography.Argon2" />
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
+      <!--#endif -->
       <PackageReference Include="Microsoft.EntityFrameworkCore" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
