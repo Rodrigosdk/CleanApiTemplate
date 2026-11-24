@@ -1,9 +1,10 @@
 # Template `cleanapi`
 
-Template do `dotnet new` com a arquitetura usada no PolicyDesk: Clean Architecture em camadas, usuários com JWT, ProblemDetails, OpenTelemetry, EF Core + PostgreSQL, Docker, CI no GitHub Actions e testes com Testcontainers.
+Template do `dotnet new` com a arquitetura usada no PolicyDesk: Clean Architecture em camadas, ProblemDetails, EF Core + PostgreSQL, Docker, CI no GitHub Actions e testes com Testcontainers. A autenticação com JWT, o logging e a observabilidade são escolhidos na geração.
 
 Este arquivo e a pasta `.template.config` não vão para os projetos gerados.
 
+A fonte do template é a variante padrão (com tudo ligado) e compila e testa como um projeto normal. As variações ficam em blocos `#if (auth)`, `#if (logging)` e `#if (observability)` (`<!--#if -->` em XML, `.resx` e Markdown; `//#if` em JSON; `#if` em YAML). O `Directory.Build.props` define esses símbolos só na fonte; o bloco é removido nos projetos gerados.
 
 ## Instalar
 
@@ -19,6 +20,19 @@ Depois de alterar o template, rode o mesmo comando com `--force` para atualizar 
 dotnet new cleanapi -n MeuProjeto
 cd MeuProjeto
 git init
+```
+
+### Opções
+
+| Opção | Valores | Padrão | O que muda |
+| --- | --- | --- | --- |
+| `--auth` | `true`, `false` | `true` | Usuários (`User`, repositórios, migration), cadastro, login, perfil, Argon2, JWT e a exigência de token nos endpoints. Sem ele, o projeto sai sem entidades nem migrations |
+| `--logging` | `true`, `false` | `true` | Log por requisição (`HttpLogging`) e o catálogo de logs de negócio dos casos de uso. O log de erros inesperados (500) e de cancelamento continua sempre |
+| `--observability` | `true`, `false` | `true` | OpenTelemetry (traces, métricas e logs via OTLP) e o Aspire Dashboard no `compose.dev.yml` |
+
+```bash
+dotnet new cleanapi -n MeuProjeto --auth false
+dotnet new cleanapi -n MeuProjeto --logging false --observability false
 ```
 
 A palavra `Template` é substituída pelo nome informado em tudo: pastas, arquivos, namespaces, solution, Dockerfile e workflows. Variações em minúsculas (`template` → `meuprojeto`) também são trocadas, o que cobre o nome do compose, do banco e das senhas locais. Os GUIDs da solution e o `UserSecretsId` são gerados de novo em cada projeto.
@@ -39,7 +53,7 @@ Use um nome em PascalCase sem pontos (`MeuProjeto`), porque a forma minúscula v
 ## Checklist depois de gerar
 
 1. Revisar o `LICENSE` e os badges do `README.md`.
-2. Para recomeçar o histórico do banco, apague `DataAccess/Migrations/*_InitialCreate*` e o snapshot e gere de novo:
+2. Gerar a migration quando criar a primeira entidade (ou, com `--auth`, para recomeçar o histórico, apagando antes `DataAccess/Migrations/*_InitialCreate*` e o snapshot):
    `dotnet ef migrations add InitialCreate --project src/Backend/MeuProjeto.Infrastructure --output-dir DataAccess/Migrations`
 3. Adicionar mensagens novas nos dois `.resx` e no `ResourcesMessageException.Designer.cs` (o `dotnet build` não regenera o Designer; o Rider/VS sim).
 4. Escolher a forma de deploy; o `docker/Dockerfile` já gera a imagem de produção.
