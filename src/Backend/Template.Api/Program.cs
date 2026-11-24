@@ -20,7 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 const long maxRequestBodySizeInBytes = 64 * 1024;
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = maxRequestBodySizeInBytes);
 
+#if (observability)
 builder.AddObservability();
+#endif
 #if (logging)
 builder.Services.AddRequestLogging();
 #endif

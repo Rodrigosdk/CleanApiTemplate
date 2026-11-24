@@ -8,7 +8,9 @@
 [![C#](https://img.shields.io/badge/C%23-14-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+<!--#if (observability) -->
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Observability-F5A800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
+<!--#endif -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 </div>
@@ -111,7 +113,9 @@ Template
 | **Plataforma** | .NET 10, ASP.NET Core, C# |
 | **Persistência** | Entity Framework Core 10, PostgreSQL 17 (Npgsql) |
 | **Documentação da API** | OpenAPI nativo + Swagger UI |
+<!--#if (observability) -->
 | **Observabilidade** | OpenTelemetry (logs, traces e métricas), exportação OTLP, .NET Aspire Dashboard, health checks |
+<!--#endif -->
 | **Testes** | xUnit, Shouldly, Moq, Bogus, Testcontainers, `WebApplicationFactory`, Coverlet |
 | **Infraestrutura** | Docker (build multi-stage, usuário não-root), Docker Compose |
 
@@ -152,7 +156,9 @@ docker compose -f docker/compose.yml -f docker/compose.dev.yml up -d --build
 
 | Serviço | Endereço |
 | --- | --- |
+<!--#if (observability) -->
 | Aspire Dashboard (logs, traces e métricas) | http://localhost:18888 |
+<!--#endif -->
 | pgAdmin | http://localhost:5050 |
 
 O servidor **Template (local)** já aparece cadastrado no pgAdmin; na primeira conexão, informe a senha do banco (`template-local`, ou o valor de `DB_PASSWORD`). Para derrubar tudo, use os mesmos `-f` com `down`.
@@ -255,6 +261,7 @@ Todas as falhas seguem o mesmo contrato, com status HTTP coerente (`400`, `404`,
 O mesmo `traceId` volta no cabeçalho `X-Trace-Id` de toda resposta e aparece nos logs, o que permite rastrear qualquer requisição de ponta a ponta.
 
 ---
+<!--#if (logging || observability) -->
 
 ## 📊 Logs e observabilidade
 
@@ -262,11 +269,14 @@ O mesmo `traceId` volta no cabeçalho `X-Trace-Id` de toda resposta e aparece no
 - **Logs estruturados** (JSON em produção) com uma linha por requisição, sem corpo nem query string, para não expor dados pessoais (**LGPD**)
 - **Catálogo de eventos** com `[LoggerMessage]` em `Application/Logging/ApplicationLogs.cs`
 <!--#endif -->
+<!--#if (observability) -->
 - **Traces** distribuídos do ASP.NET Core, de chamadas HTTP de saída e de consultas ao banco
 - **Métricas** de requisições, runtime do .NET e EF Core
 - Exportação OTLP ativada só quando `OTEL_EXPORTER_OTLP_ENDPOINT` está definida; com o `compose.dev.yml`, os dados chegam ao Aspire Dashboard
+<!--#endif -->
 
 ---
+<!--#endif -->
 
 ## 🧪 Testes
 

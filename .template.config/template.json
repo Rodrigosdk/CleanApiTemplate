@@ -101,6 +101,12 @@
             "src/Backend/Template.Application/Logging/**",
             "tests/src/CommonTestUtilities/Loggers/**"
           ]
+        },
+        {
+          "condition": "(!observability)",
+          "exclude": [
+            "src/Backend/Template.Api/Observability/ObservabilitySetup.cs"
+          ]
         }
       ]
     }
@@ -117,6 +123,12 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Inclui o log por requisição (HttpLogging) e o catálogo de logs de negócio dos casos de uso."
+    },
+    "observability": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Inclui OpenTelemetry (traces, métricas e logs via OTLP) e o Aspire Dashboard no compose de desenvolvimento."
     }
   },
   "SpecialCustomOperations": {
