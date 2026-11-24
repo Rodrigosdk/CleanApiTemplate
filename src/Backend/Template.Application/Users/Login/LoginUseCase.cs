@@ -1,5 +1,7 @@
+#if (logging)
 using Microsoft.Extensions.Logging;
 using Template.Application.Logging;
+#endif
 using Template.Communication.Requests;
 using Template.Communication.Responses;
 using Template.Domain.Repositories.Users;
@@ -14,8 +16,12 @@ namespace Template.Application.Users.Login;
 internal class LoginUseCase(
     IUsersReadOnlyRepository usersReadOnlyRepository,
     IPasswordHashing passwordHashing,
+#if (logging)
     IAccessTokenGenerator accessTokenGenerator,
     ILogger<LoginUseCase> logger) : ILoginUseCase
+#else
+    IAccessTokenGenerator accessTokenGenerator) : ILoginUseCase
+#endif
 {
     public async Task<ResponseLoginJson> ExecuteAsync(RequestLoginJson request, CancellationToken cancellationToken = default)
     {
@@ -34,7 +40,9 @@ internal class LoginUseCase(
         }
 
         var accessToken = accessTokenGenerator.Generate(user.Id);
+#if (logging)
         logger.UserLoggedIn(user.Id);
+#endif
 
         return new ResponseLoginJson
         {
@@ -44,9 +52,14 @@ internal class LoginUseCase(
         };
     }
 
+#if (logging)
     private UnauthorizedException InvalidCredentials()
     {
         logger.UserLoginFailed();
+#else
+    private static UnauthorizedException InvalidCredentials()
+    {
+#endif
         return new UnauthorizedException(ResourcesMessageException.USER_INVALID_CREDENTIALS);
     }
 

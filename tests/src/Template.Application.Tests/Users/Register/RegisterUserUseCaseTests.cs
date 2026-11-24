@@ -1,4 +1,6 @@
+#if (logging)
 using CommonTestUtilities.Loggers;
+#endif
 using CommonTestUtilities.Repositories;
 using CommonTestUtilities.Repositories.Users;
 using CommonTestUtilities.Requests;
@@ -135,7 +137,11 @@ public class RegisterUserUseCaseTests
             UsersWriteOnlyRepositoryBuilder.Build(),
             usersReadOnlyRepositoryBuilder.Build(),
             new PasswordHashingBuilder().Build(),
+#if (logging)
             UnitOfWorkBuilder.Build(),
             LoggerBuilder.Build<RegisterUserUseCase>());
+#else
+            UnitOfWorkBuilder.Build());
+#endif
     }
 }

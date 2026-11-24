@@ -8,7 +8,9 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+      <!--#if (logging) -->
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+      <!--#endif -->
     </ItemGroup>
 
 </Project>

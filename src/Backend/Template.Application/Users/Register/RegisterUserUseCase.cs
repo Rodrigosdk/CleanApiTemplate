@@ -1,5 +1,7 @@
+#if (logging)
 using Microsoft.Extensions.Logging;
 using Template.Application.Logging;
+#endif
 using Template.Communication.Requests;
 using Template.Communication.Responses;
 using Template.Domain.Entities;
@@ -16,8 +18,12 @@ internal class RegisterUserUseCase(
     IUsersWriteOnlyRepository usersWriteOnlyRepository,
     IUsersReadOnlyRepository usersReadOnlyRepository,
     IPasswordHashing passwordHashing,
+#if (logging)
     IUnitOfWork unitOfWork,
     ILogger<RegisterUserUseCase> logger) : IRegisterUserUseCase
+#else
+    IUnitOfWork unitOfWork) : IRegisterUserUseCase
+#endif
 {
     public async Task<ResponseRegisteredUserJson> ExecuteAsync(RequestUserJson request, CancellationToken cancellationToken = default)
     {
@@ -33,7 +39,9 @@ internal class RegisterUserUseCase(
 
         await usersWriteOnlyRepository.AddAsync(user);
         await unitOfWork.CommitAsync(cancellationToken);
+#if (logging)
         logger.UserRegistered(user.Id);
+#endif
 
         return new ResponseRegisteredUserJson { Nome = request.Nome};
     }

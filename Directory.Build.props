@@ -11,7 +11,7 @@
     <!--#if (false) -->
 
     <PropertyGroup>
-        <DefineConstants>$(DefineConstants);auth</DefineConstants>
+        <DefineConstants>$(DefineConstants);auth;logging</DefineConstants>
     </PropertyGroup>
     <!--#endif -->
 

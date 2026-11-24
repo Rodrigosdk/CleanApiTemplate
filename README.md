@@ -258,8 +258,10 @@ O mesmo `traceId` volta no cabeçalho `X-Trace-Id` de toda resposta e aparece no
 
 ## 📊 Logs e observabilidade
 
+<!--#if (logging) -->
 - **Logs estruturados** (JSON em produção) com uma linha por requisição, sem corpo nem query string, para não expor dados pessoais (**LGPD**)
 - **Catálogo de eventos** com `[LoggerMessage]` em `Application/Logging/ApplicationLogs.cs`
+<!--#endif -->
 - **Traces** distribuídos do ASP.NET Core, de chamadas HTTP de saída e de consultas ao banco
 - **Métricas** de requisições, runtime do .NET e EF Core
 - Exportação OTLP ativada só quando `OTEL_EXPORTER_OTLP_ENDPOINT` está definida; com o `compose.dev.yml`, os dados chegam ao Aspire Dashboard

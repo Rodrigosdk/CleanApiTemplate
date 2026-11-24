@@ -93,6 +93,14 @@
             "tests/src/Template.Infrastructure.Tests/Security/**",
             "tests/src/Template.Infrastructure.Tests/Users/**"
           ]
+        },
+        {
+          "condition": "(!logging)",
+          "exclude": [
+            "src/Backend/Template.Api/Logging/RequestLoggingSetup.cs",
+            "src/Backend/Template.Application/Logging/**",
+            "tests/src/CommonTestUtilities/Loggers/**"
+          ]
         }
       ]
     }
@@ -103,6 +111,12 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Inclui cadastro de usuários, login com JWT (Argon2) e exige token nos endpoints."
+    },
+    "logging": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Inclui o log por requisição (HttpLogging) e o catálogo de logs de negócio dos casos de uso."
     }
   },
   "SpecialCustomOperations": {

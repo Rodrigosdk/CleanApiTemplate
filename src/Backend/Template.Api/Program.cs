@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Localization;
 using Template.Api.Converters;
 using Template.Api.Errors;
 using Template.Api.Filters;
+#if (logging)
 using Template.Api.Logging;
+#endif
 using Template.Api.Observability;
 #if (auth)
 using Template.Api.Security;
@@ -19,7 +21,9 @@ const long maxRequestBodySizeInBytes = 64 * 1024;
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = maxRequestBodySizeInBytes);
 
 builder.AddObservability();
+#if (logging)
 builder.Services.AddRequestLogging();
+#endif
 builder.Services.AddErrorHandling();
 
 builder.Services.AddControllers(options => options.Filters.Add<ExceptionFilter>()).AddJsonOptions(options =>
@@ -66,7 +70,9 @@ var app = builder.Build();
 // Ordem: o cabeçalho de correlação e o log de requisições envolvem o tratamento de erros,
 // para que o status final (inclusive 500) apareça no log e o X-Trace-Id vá em toda resposta
 app.UseCorrelationIdHeader();
+#if (logging)
 app.UseHttpLogging();
+#endif
 app.UseErrorHandling();
 
 app.UseRequestLocalization();
