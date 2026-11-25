@@ -37,11 +37,22 @@ internal class UserMap : IEntityTypeConfiguration<User>
             .HasDatabaseName(ActiveEmailIndex)
             .IsUnique()
             .HasFilter("\"active\" = TRUE");
-#else
+#elif (sqlserver)
         builder.HasIndex(user => user.Email)
             .HasDatabaseName(ActiveEmailIndex)
             .IsUnique()
             .HasFilter("[active] = 1");
+#else
+        // O MySQL não tem índice filtrado: a coluna gerada só tem valor para usuários ativos,
+        // e o índice único ignora os nulos dos inativos
+        builder.Property<string?>("ActiveEmail")
+            .HasColumnName("active_email")
+            .HasMaxLength(FieldLimits.Email)
+            .HasComputedColumnSql("(CASE WHEN active THEN email END)", stored: true);
+
+        builder.HasIndex("ActiveEmail")
+            .HasDatabaseName(ActiveEmailIndex)
+            .IsUnique();
 #endif
 
         builder.Property(user => user.Password)
@@ -64,10 +75,14 @@ internal class UserMap : IEntityTypeConfiguration<User>
 
 #if (postgres)
         builder.Property<uint>("Version").IsRowVersion();
-#else
+#elif (sqlserver)
         builder.Property<byte[]>("Version")
             .HasColumnName("version")
             .IsRowVersion();
+#else
+        builder.Property<Guid>(TemplateDbContext.VersionProperty)
+            .HasColumnName("version")
+            .IsConcurrencyToken();
 #endif
     }
 }

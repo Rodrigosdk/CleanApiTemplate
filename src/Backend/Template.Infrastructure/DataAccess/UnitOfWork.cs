@@ -2,8 +2,10 @@ using Microsoft.EntityFrameworkCore;
 #if (auth)
 #if (postgres)
 using Npgsql;
-#else
+#elif (sqlserver)
 using Microsoft.Data.SqlClient;
+#else
+using MySql.Data.MySqlClient;
 #endif
 using Template.Infrastructure.DataAccess.Mappings;
 #endif
@@ -18,6 +20,9 @@ internal class UnitOfWork(TemplateDbContext dbContext) : IUnitOfWork
 #if (sqlserver && auth)
     private const int UniqueIndexViolation = 2601;
     private const int UniqueConstraintViolation = 2627;
+
+#elif (mysql && auth)
+    private const int DuplicateEntry = 1062;
 
 #endif
     public async Task CommitAsync(CancellationToken cancellationToken = default)
@@ -45,9 +50,12 @@ internal class UnitOfWork(TemplateDbContext dbContext) : IUnitOfWork
 #if (postgres)
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } postgresException &&
         postgresException.ConstraintName == indexName;
-#else
+#elif (sqlserver)
         exception.InnerException is SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } sqlException &&
         sqlException.Message.Contains(indexName, StringComparison.Ordinal);
+#else
+        exception.InnerException is MySqlException { Number: DuplicateEntry } mySqlException &&
+        mySqlException.Message.Contains(indexName, StringComparison.Ordinal);
 #endif
 #endif
 }

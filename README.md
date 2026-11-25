@@ -4,16 +4,20 @@
 
 <!--#if (postgres) -->
 **API REST em .NET 10 com Clean Architecture e PostgreSQL.**
-<!--#else -->
+<!--#elif (sqlserver) -->
 **API REST em .NET 10 com Clean Architecture e SQL Server.**
+<!--#else -->
+**API REST em .NET 10 com Clean Architecture e MySQL.**
 <!--#endif -->
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![C#](https://img.shields.io/badge/C%23-14-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
 <!--#if (postgres) -->
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-<!--#else -->
+<!--#elif (sqlserver) -->
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+<!--#else -->
+[![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 <!--#endif -->
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 <!--#if (observability) -->
@@ -51,8 +55,10 @@ O **Template** é uma API backend gerada a partir do template `cleanapi`. Ela j�
 - Paginação padronizada (`RequestPaginationJson` / `ResponsePagedJson`)
 <!--#if (postgres) -->
 - Concorrência otimista com a coluna de sistema `xmin` do PostgreSQL
-<!--#else -->
+<!--#elif (sqlserver) -->
 - Concorrência otimista com coluna `rowversion` do SQL Server
+<!--#else -->
+- Concorrência otimista com uma coluna `version` renovada a cada gravação
 <!--#endif -->
 - Tempo sempre lido de `TimeProvider`, substituído por `FakeTimeProvider` nos testes
 - Migrations aplicadas automaticamente fora de produção
@@ -125,8 +131,10 @@ Template
 | **Plataforma** | .NET 10, ASP.NET Core, C# |
 <!--#if (postgres) -->
 | **Persistência** | Entity Framework Core 10, PostgreSQL 17 (Npgsql) |
-<!--#else -->
+<!--#elif (sqlserver) -->
 | **Persistência** | Entity Framework Core 10, SQL Server 2022 |
+<!--#else -->
+| **Persistência** | Entity Framework Core 10, MySQL 8.4 (MySql.EntityFrameworkCore) |
 <!--#endif -->
 | **Documentação da API** | OpenAPI nativo + Swagger UI |
 <!--#if (observability) -->
@@ -196,9 +204,13 @@ docker compose -f docker/compose.yml up -d db
 dotnet user-secrets set "ConnectionStrings:DbConnection" \
   "Host=localhost;Port=5432;Database=Template;Username=admin;Password=template-local" \
   --project src/Backend/Template.Api
-<!--#else -->
+<!--#elif (sqlserver) -->
 dotnet user-secrets set "ConnectionStrings:DbConnection" \
   "Server=localhost,1433;Database=Template;User Id=sa;Password=Template-Local-123;TrustServerCertificate=True" \
+  --project src/Backend/Template.Api
+<!--#else -->
+dotnet user-secrets set "ConnectionStrings:DbConnection" \
+  "Server=localhost;Port=3306;Database=Template;User=admin;Password=template-local" \
   --project src/Backend/Template.Api
 <!--#endif -->
 <!--#if (auth) -->

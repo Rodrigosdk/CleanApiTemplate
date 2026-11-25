@@ -10,8 +10,10 @@ internal class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Template
 {
 #if (postgres)
     private const string ReferenceConnectionString = "Host=localhost;Port=5432;Database=Template";
-#else
+#elif (sqlserver)
     private const string ReferenceConnectionString = "Server=localhost,1433;Database=Template;TrustServerCertificate=True";
+#else
+    private const string ReferenceConnectionString = "Server=localhost;Port=3306;Database=Template";
 #endif
 
     public TemplateDbContext CreateDbContext(string[] args)

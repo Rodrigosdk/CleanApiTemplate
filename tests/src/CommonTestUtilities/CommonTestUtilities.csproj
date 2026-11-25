@@ -10,8 +10,10 @@
         <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
         <!--#if (postgres) -->
         <PackageReference Include="Testcontainers.PostgreSql" />
-        <!--#else -->
+        <!--#elif (sqlserver) -->
         <PackageReference Include="Testcontainers.MsSql" />
+        <!--#else -->
+        <PackageReference Include="Testcontainers.MySql" />
         <!--#endif -->
     </ItemGroup>
 

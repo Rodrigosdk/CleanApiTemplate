@@ -10,9 +10,12 @@ public class HealthCheckTests(TemplateApplicationFactory factory) : IClassFixtur
 #if (postgres)
     private const string UnreachableDatabase =
         "Host=127.0.0.1;Port=1;Database=template;Username=template;Password=x;Timeout=2";
-#else
+#elif (sqlserver)
     private const string UnreachableDatabase =
         "Server=127.0.0.1,1;Database=template;User Id=template;Password=x;Connect Timeout=2;TrustServerCertificate=True";
+#else
+    private const string UnreachableDatabase =
+        "Server=127.0.0.1;Port=1;Database=template;User=template;Password=x;Connection Timeout=2";
 #endif
 
     [Fact(DisplayName = nameof(Deve_RetornarHealthy_Quando_BancoEstiverDisponivel))]

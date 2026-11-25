@@ -21,13 +21,15 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.15" />
     <!--#if (postgres) -->
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-    <!--#else -->
+    <!--#elif (sqlserver) -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.15" />
+    <!--#else -->
+    <PackageVersion Include="MySql.EntityFrameworkCore" Version="10.0.12" />
     <!--#endif -->
     <!--#if (observability) -->
     <!--#if (postgres) -->
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.3" />
-    <!--#else -->
+    <!--#elif (sqlserver) -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.21.0" />
     <!--#endif -->
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.21.0" />
@@ -50,8 +52,10 @@
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <!--#if (postgres) -->
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
-    <!--#else -->
+    <!--#elif (sqlserver) -->
     <PackageVersion Include="Testcontainers.MsSql" Version="4.16.0" />
+    <!--#else -->
+    <PackageVersion Include="Testcontainers.MySql" Version="4.16.0" />
     <!--#endif -->
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />

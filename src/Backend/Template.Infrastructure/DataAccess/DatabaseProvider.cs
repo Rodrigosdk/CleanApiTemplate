@@ -7,7 +7,9 @@ public static class DatabaseProvider
     public static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string connectionString) =>
 #if (postgres)
         builder.UseNpgsql(connectionString);
-#else
+#elif (sqlserver)
         builder.UseSqlServer(connectionString);
+#else
+        builder.UseMySQL(connectionString);
 #endif
 }

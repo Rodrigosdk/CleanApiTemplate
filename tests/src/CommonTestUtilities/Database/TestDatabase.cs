@@ -3,8 +3,10 @@ using Microsoft.Data.SqlClient;
 #endif
 #if (postgres)
 using Testcontainers.PostgreSql;
-#else
+#elif (sqlserver)
 using Testcontainers.MsSql;
+#else
+using Testcontainers.MySql;
 #endif
 
 namespace CommonTestUtilities.Database;
@@ -17,9 +19,15 @@ public sealed class TestDatabase(string databaseName) : IAsyncDisposable
         .WithUsername("template")
         .WithPassword("test-password")
         .Build();
-#else
+#elif (sqlserver)
     private readonly MsSqlContainer _container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest")
         .WithPassword("Test-Password-123")
+        .Build();
+#else
+    private readonly MySqlContainer _container = new MySqlBuilder("mysql:8.4")
+        .WithDatabase(databaseName)
+        .WithUsername("template")
+        .WithPassword("test-password")
         .Build();
 #endif
 

@@ -28,8 +28,10 @@ public static class ObservabilitySetup
                 .AddAspNetCoreInstrumentation(options => options.RecordException = true)
 #if (postgres)
                 .AddNpgsql()
-#else
+#elif (sqlserver)
                 .AddSqlClientInstrumentation()
+#else
+                .AddSource("connector-net")
 #endif
                 .AddHttpClientInstrumentation())
             .WithMetrics(metrics => metrics

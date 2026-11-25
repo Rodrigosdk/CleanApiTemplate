@@ -125,6 +125,11 @@
       "source": "./.template.config/migrations/sqlserver/",
       "target": "./src/Backend/Template.Infrastructure/DataAccess/Migrations/",
       "condition": "(sqlserver && auth)"
+    },
+    {
+      "source": "./.template.config/migrations/mysql/",
+      "target": "./src/Backend/Template.Infrastructure/DataAccess/Migrations/",
+      "condition": "(mysql && auth)"
     }
   ],
   "symbols": {
@@ -141,6 +146,10 @@
         {
           "choice": "sqlserver",
           "description": "SQL Server"
+        },
+        {
+          "choice": "mysql",
+          "description": "MySQL"
         }
       ]
     },
@@ -169,6 +178,10 @@
     "sqlserver": {
       "type": "computed",
       "value": "(database == \"sqlserver\")"
+    },
+    "mysql": {
+      "type": "computed",
+      "value": "(database == \"mysql\")"
     }
   },
   "SpecialCustomOperations": {

@@ -16,7 +16,7 @@
         <!--#if (observability) -->
         <!--#if (postgres) -->
         <PackageReference Include="Npgsql.OpenTelemetry" />
-        <!--#else -->
+        <!--#elif (sqlserver) -->
         <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
         <!--#endif -->
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />

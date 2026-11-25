@@ -17,7 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-#else
+#elif (sqlserver)
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
@@ -32,6 +32,22 @@ services:
       timeout: 5s
       retries: 10
       start_period: 20s
+#else
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: Template
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: ${DB_PASSWORD:-template-local}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-template-local-root}
+    ports:
+      - "3306:3306"
+    volumes:
+      - template-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u \"$${MYSQL_USER}\" -p\"$${MYSQL_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 #endif
 
   api:
@@ -42,8 +58,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
 #if (postgres)
       ConnectionStrings__DbConnection: Host=db;Port=5432;Database=Template;Username=admin;Password=${DB_PASSWORD:-template-local}
-#else
+#elif (sqlserver)
       ConnectionStrings__DbConnection: Server=db,1433;Database=Template;User Id=sa;Password=${DB_PASSWORD:-Template-Local-123};TrustServerCertificate=True
+#else
+      ConnectionStrings__DbConnection: Server=db;Port=3306;Database=Template;User=admin;Password=${DB_PASSWORD:-template-local}
 #endif
 #if (auth)
       Jwt__SigningKey: ${JWT_SIGNING_KEY:-template-local-jwt-signing-key-change-me}
