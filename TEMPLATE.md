@@ -1,10 +1,10 @@
 # Template `cleanapi`
 
-Template do `dotnet new` com a arquitetura usada no PolicyDesk: Clean Architecture em camadas, ProblemDetails, EF Core + PostgreSQL, Docker, CI no GitHub Actions e testes com Testcontainers. A autenticação com JWT, o logging e a observabilidade são escolhidos na geração.
+Template do `dotnet new` com a arquitetura usada no PolicyDesk: Clean Architecture em camadas, ProblemDetails, EF Core, Docker, CI no GitHub Actions e testes com Testcontainers. O banco, a autenticação com JWT, o logging e a observabilidade são escolhidos na geração.
 
 Este arquivo e a pasta `.template.config` não vão para os projetos gerados.
 
-A fonte do template é a variante padrão (com tudo ligado) e compila e testa como um projeto normal. As variações ficam em blocos `#if (auth)`, `#if (logging)` e `#if (observability)` (`<!--#if -->` em XML, `.resx` e Markdown; `//#if` em JSON; `#if` em YAML). O `Directory.Build.props` define esses símbolos só na fonte; o bloco é removido nos projetos gerados.
+A fonte do template é a variante padrão (PostgreSQL, com tudo ligado) e compila e testa como um projeto normal. As variações ficam em blocos `#if (auth)`, `#if (postgres)` etc. (`<!--#if -->` em XML, `.resx` e Markdown; `//#if` em JSON; `#if` em YAML). O `Directory.Build.props` define esses símbolos só na fonte; o bloco é removido nos projetos gerados. As migrations de SQL Server e MySQL ficam em `.template.config/migrations/` e são copiadas para `DataAccess/Migrations` conforme o banco escolhido.
 
 ## Instalar
 
@@ -26,14 +26,27 @@ git init
 
 | Opção | Valores | Padrão | O que muda |
 | --- | --- | --- | --- |
+| `--database` | `postgres`, `sqlserver`, `mysql` | `postgres` | Provider do EF Core, migration `InitialCreate`, controle de concorrência, índice único de e-mail, tratamento de violação de unicidade, Testcontainers, docker compose e instrumentação do OpenTelemetry |
 | `--auth` | `true`, `false` | `true` | Usuários (`User`, repositórios, migration), cadastro, login, perfil, Argon2, JWT e a exigência de token nos endpoints. Sem ele, o projeto sai sem entidades nem migrations |
 | `--logging` | `true`, `false` | `true` | Log por requisição (`HttpLogging`) e o catálogo de logs de negócio dos casos de uso. O log de erros inesperados (500) e de cancelamento continua sempre |
 | `--observability` | `true`, `false` | `true` | OpenTelemetry (traces, métricas e logs via OTLP) e o Aspire Dashboard no `compose.dev.yml` |
 
 ```bash
-dotnet new cleanapi -n MeuProjeto --auth false
+dotnet new cleanapi -n MeuProjeto --database sqlserver
+dotnet new cleanapi -n MeuProjeto --database mysql --auth false
 dotnet new cleanapi -n MeuProjeto --logging false --observability false
 ```
+
+Diferenças por banco:
+
+| | PostgreSQL | SQL Server | MySQL |
+| --- | --- | --- | --- |
+| Provider | `Npgsql.EntityFrameworkCore.PostgreSQL` | `Microsoft.EntityFrameworkCore.SqlServer` | `MySql.EntityFrameworkCore` (Oracle) |
+| Concorrência | coluna de sistema `xmin` | `rowversion` | coluna `version` (Guid) renovada pelo `DbContext` a cada gravação |
+| E-mail único entre ativos | índice filtrado | índice filtrado | coluna gerada `active_email` + índice único |
+| Ferramenta no `compose.dev.yml` | pgAdmin | — | — |
+
+O provider MySQL é o oficial da Oracle porque o Pomelo ainda não tem versão para o EF Core 10.
 
 A palavra `Template` é substituída pelo nome informado em tudo: pastas, arquivos, namespaces, solution, Dockerfile e workflows. Variações em minúsculas (`template` → `meuprojeto`) também são trocadas, o que cobre o nome do compose, do banco e das senhas locais. Os GUIDs da solution e o `UserSecretsId` são gerados de novo em cada projeto.
 
