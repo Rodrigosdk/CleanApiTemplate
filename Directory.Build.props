@@ -11,7 +11,7 @@
     <!--#if (false) -->
 
     <PropertyGroup>
-        <DefineConstants>$(DefineConstants);auth;logging;observability</DefineConstants>
+        <DefineConstants>$(DefineConstants);postgres;auth;logging;observability</DefineConstants>
     </PropertyGroup>
     <!--#endif -->
 

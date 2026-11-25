@@ -2,6 +2,7 @@ name: template
 
 services:
   db:
+#if (postgres)
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: Template
@@ -16,6 +17,22 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+#else
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:-Template-Local-123}
+    ports:
+      - "1433:1433"
+    volumes:
+      - template-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+#endif
 
   api:
     build:
@@ -23,7 +40,11 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+#if (postgres)
       ConnectionStrings__DbConnection: Host=db;Port=5432;Database=Template;Username=admin;Password=${DB_PASSWORD:-template-local}
+#else
+      ConnectionStrings__DbConnection: Server=db,1433;Database=Template;User Id=sa;Password=${DB_PASSWORD:-Template-Local-123};TrustServerCertificate=True
+#endif
 #if (auth)
       Jwt__SigningKey: ${JWT_SIGNING_KEY:-template-local-jwt-signing-key-change-me}
 #endif

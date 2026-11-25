@@ -19,9 +19,10 @@ services:
       - "18888:18888"
       - "4317:18889"
 #endif
-#if (observability)
+#if (postgres && observability)
 
 #endif
+#if (postgres)
   pgadmin:
     image: dpage/pgadmin4:9
     environment:
@@ -40,3 +41,4 @@ services:
 
 volumes:
   pgadmin-data:
+#endif

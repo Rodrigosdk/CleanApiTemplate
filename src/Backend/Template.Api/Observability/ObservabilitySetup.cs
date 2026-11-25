@@ -1,4 +1,6 @@
+#if (postgres)
 using Npgsql;
+#endif
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -24,13 +26,19 @@ public static class ObservabilitySetup
             .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
             .WithTracing(tracing => tracing
                 .AddAspNetCoreInstrumentation(options => options.RecordException = true)
+#if (postgres)
                 .AddNpgsql()
+#else
+                .AddSqlClientInstrumentation()
+#endif
                 .AddHttpClientInstrumentation())
             .WithMetrics(metrics => metrics
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
                 .AddRuntimeInstrumentation()
+#if (postgres)
                 .AddMeter("Npgsql")
+#endif
                 .AddMeter("Microsoft.EntityFrameworkCore"));
 
         if (!string.IsNullOrWhiteSpace(builder.Configuration[OtlpEndpointKey]))

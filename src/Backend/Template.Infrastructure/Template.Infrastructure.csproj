@@ -18,7 +18,11 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
       <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+      <!--#if (postgres) -->
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+      <!--#else -->
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+      <!--#endif -->
     </ItemGroup>
 
 </Project>

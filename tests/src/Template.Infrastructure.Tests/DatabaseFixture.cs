@@ -6,7 +6,11 @@ namespace Template.Infrastructure.Tests;
 
 public sealed class DatabaseFixture : IAsyncLifetime, IAsyncDisposable
 {
+#if (postgres)
     private const string CleanTablesSql = "TRUNCATE TABLE users CASCADE;";
+#else
+    private const string CleanTablesSql = "DELETE FROM users;";
+#endif
 
     private readonly TestDatabase _database = new("template_infrastructure_tests");
 

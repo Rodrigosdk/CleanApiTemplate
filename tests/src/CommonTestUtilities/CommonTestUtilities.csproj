@@ -8,7 +8,11 @@
         <PackageReference Include="Bogus" />
         <PackageReference Include="Moq" />
         <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+        <!--#if (postgres) -->
         <PackageReference Include="Testcontainers.PostgreSql" />
+        <!--#else -->
+        <PackageReference Include="Testcontainers.MsSql" />
+        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>

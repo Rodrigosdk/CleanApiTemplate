@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 #if (auth)
+#if (postgres)
 using Npgsql;
+#else
+using Microsoft.Data.SqlClient;
+#endif
 using Template.Infrastructure.DataAccess.Mappings;
 #endif
 using Template.Domain.Repositories;
@@ -11,6 +15,11 @@ namespace Template.Infrastructure.DataAccess;
 
 internal class UnitOfWork(TemplateDbContext dbContext) : IUnitOfWork
 {
+#if (sqlserver && auth)
+    private const int UniqueIndexViolation = 2601;
+    private const int UniqueConstraintViolation = 2627;
+
+#endif
     public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -33,7 +42,12 @@ internal class UnitOfWork(TemplateDbContext dbContext) : IUnitOfWork
 #if (auth)
 
     private static bool IsUniqueViolation(DbUpdateException exception, string indexName) =>
+#if (postgres)
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } postgresException &&
         postgresException.ConstraintName == indexName;
+#else
+        exception.InnerException is SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } sqlException &&
+        sqlException.Message.Contains(indexName, StringComparison.Ordinal);
+#endif
 #endif
 }

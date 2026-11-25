@@ -32,10 +32,17 @@ internal class UserMap : IEntityTypeConfiguration<User>
             .HasMaxLength(FieldLimits.Email)
             .IsRequired();
 
+#if (postgres)
         builder.HasIndex(user => user.Email)
             .HasDatabaseName(ActiveEmailIndex)
             .IsUnique()
             .HasFilter("\"active\" = TRUE");
+#else
+        builder.HasIndex(user => user.Email)
+            .HasDatabaseName(ActiveEmailIndex)
+            .IsUnique()
+            .HasFilter("[active] = 1");
+#endif
 
         builder.Property(user => user.Password)
             .HasColumnName("password")
@@ -55,6 +62,12 @@ internal class UserMap : IEntityTypeConfiguration<User>
         builder.Property(user => user.DeactivatedAt)
             .HasColumnName("deactivated_at");
 
+#if (postgres)
         builder.Property<uint>("Version").IsRowVersion();
+#else
+        builder.Property<byte[]>("Version")
+            .HasColumnName("version")
+            .IsRowVersion();
+#endif
     }
 }

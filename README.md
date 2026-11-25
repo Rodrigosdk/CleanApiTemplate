@@ -2,11 +2,19 @@
 
 # 🚀 Template
 
+<!--#if (postgres) -->
 **API REST em .NET 10 com Clean Architecture e PostgreSQL.**
+<!--#else -->
+**API REST em .NET 10 com Clean Architecture e SQL Server.**
+<!--#endif -->
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![C#](https://img.shields.io/badge/C%23-14-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
+<!--#if (postgres) -->
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+<!--#else -->
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+<!--#endif -->
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 <!--#if (observability) -->
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Observability-F5A800?style=for-the-badge&logo=opentelemetry&logoColor=white)](https://opentelemetry.io/)
@@ -41,7 +49,11 @@ O **Template** é uma API backend gerada a partir do template `cleanapi`. Ela j�
 ### 🧱 Base pronta
 - Tratamento de erros único em **ProblemDetails**, com mensagens localizadas (pt-BR e en)
 - Paginação padronizada (`RequestPaginationJson` / `ResponsePagedJson`)
+<!--#if (postgres) -->
 - Concorrência otimista com a coluna de sistema `xmin` do PostgreSQL
+<!--#else -->
+- Concorrência otimista com coluna `rowversion` do SQL Server
+<!--#endif -->
 - Tempo sempre lido de `TimeProvider`, substituído por `FakeTimeProvider` nos testes
 - Migrations aplicadas automaticamente fora de produção
 - Health check em `/health`, incluindo a conectividade com o banco
@@ -111,7 +123,11 @@ Template
 | Categoria | Ferramentas |
 | --- | --- |
 | **Plataforma** | .NET 10, ASP.NET Core, C# |
+<!--#if (postgres) -->
 | **Persistência** | Entity Framework Core 10, PostgreSQL 17 (Npgsql) |
+<!--#else -->
+| **Persistência** | Entity Framework Core 10, SQL Server 2022 |
+<!--#endif -->
 | **Documentação da API** | OpenAPI nativo + Swagger UI |
 <!--#if (observability) -->
 | **Observabilidade** | OpenTelemetry (logs, traces e métricas), exportação OTLP, .NET Aspire Dashboard, health checks |
@@ -145,6 +161,7 @@ docker compose -f docker/compose.yml up --build
 As migrations são aplicadas automaticamente na inicialização, fora do ambiente de produção.
 
 > A senha do banco pode ser definida pela variável `DB_PASSWORD`. Sem ela, é usado um valor padrão para desenvolvimento local.
+<!--#if (postgres || observability) -->
 
 #### Ferramentas de desenvolvimento
 
@@ -159,9 +176,14 @@ docker compose -f docker/compose.yml -f docker/compose.dev.yml up -d --build
 <!--#if (observability) -->
 | Aspire Dashboard (logs, traces e métricas) | http://localhost:18888 |
 <!--#endif -->
+<!--#if (postgres) -->
 | pgAdmin | http://localhost:5050 |
+<!--#endif -->
+<!--#if (postgres) -->
 
 O servidor **Template (local)** já aparece cadastrado no pgAdmin; na primeira conexão, informe a senha do banco (`template-local`, ou o valor de `DB_PASSWORD`). Para derrubar tudo, use os mesmos `-f` com `down`.
+<!--#endif -->
+<!--#endif -->
 
 ### Opção 2 — Execução local com `dotnet run`
 
@@ -170,9 +192,15 @@ O servidor **Template (local)** já aparece cadastrado no pgAdmin; na primeira c
 docker compose -f docker/compose.yml up -d db
 
 # 2. Configure a connection string via User Secrets
+<!--#if (postgres) -->
 dotnet user-secrets set "ConnectionStrings:DbConnection" \
   "Host=localhost;Port=5432;Database=Template;Username=admin;Password=template-local" \
   --project src/Backend/Template.Api
+<!--#else -->
+dotnet user-secrets set "ConnectionStrings:DbConnection" \
+  "Server=localhost,1433;Database=Template;User Id=sa;Password=Template-Local-123;TrustServerCertificate=True" \
+  --project src/Backend/Template.Api
+<!--#endif -->
 <!--#if (auth) -->
 
 # 3. Configure a chave do JWT (mínimo de 32 bytes)

@@ -4,12 +4,11 @@
   "classifications": [
     "Web",
     "WebAPI",
-    "Clean Architecture",
-    "PostgreSQL"
+    "Clean Architecture"
   ],
   "identity": "Rodrigosdk.CleanApi",
   "name": "Clean Architecture Web API (.NET 10)",
-  "description": "API REST em camadas (Api, Application, Domain, Infrastructure, Communication, Exception) com ProblemDetails, EF Core, Docker, CI e testes com Testcontainers; autenticação JWT, logging e observabilidade escolhidos na geração.",
+  "description": "API REST em camadas (Api, Application, Domain, Infrastructure, Communication, Exception) com ProblemDetails, EF Core, Docker, CI e testes com Testcontainers; banco, autenticação JWT, logging e observabilidade escolhidos na geração.",
   "shortName": "cleanapi",
   "tags": {
     "language": "C#",
@@ -53,7 +52,7 @@
           ]
         },
         {
-          "condition": "(!auth)",
+          "condition": "(!postgres || !auth)",
           "exclude": [
             "src/Backend/Template.Infrastructure/DataAccess/Migrations/2*.cs",
             "src/Backend/Template.Infrastructure/DataAccess/Migrations/TemplateDbContextModelSnapshot.cs"
@@ -107,11 +106,44 @@
           "exclude": [
             "src/Backend/Template.Api/Observability/ObservabilitySetup.cs"
           ]
+        },
+        {
+          "condition": "(!postgres)",
+          "exclude": [
+            "docker/pgadmin/**"
+          ]
+        },
+        {
+          "condition": "(!postgres && !observability)",
+          "exclude": [
+            "docker/compose.dev.yml"
+          ]
         }
       ]
+    },
+    {
+      "source": "./.template.config/migrations/sqlserver/",
+      "target": "./src/Backend/Template.Infrastructure/DataAccess/Migrations/",
+      "condition": "(sqlserver && auth)"
     }
   ],
   "symbols": {
+    "database": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "postgres",
+      "description": "Banco de dados usado pela API, pelos testes e pelo docker compose.",
+      "choices": [
+        {
+          "choice": "postgres",
+          "description": "PostgreSQL"
+        },
+        {
+          "choice": "sqlserver",
+          "description": "SQL Server"
+        }
+      ]
+    },
     "auth": {
       "type": "parameter",
       "datatype": "bool",
@@ -129,6 +161,14 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Inclui OpenTelemetry (traces, métricas e logs via OTLP) e o Aspire Dashboard no compose de desenvolvimento."
+    },
+    "postgres": {
+      "type": "computed",
+      "value": "(database == \"postgres\")"
+    },
+    "sqlserver": {
+      "type": "computed",
+      "value": "(database == \"sqlserver\")"
     }
   },
   "SpecialCustomOperations": {

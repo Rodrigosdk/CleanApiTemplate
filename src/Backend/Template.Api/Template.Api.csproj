@@ -14,7 +14,11 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <!--#if (observability) -->
+        <!--#if (postgres) -->
         <PackageReference Include="Npgsql.OpenTelemetry" />
+        <!--#else -->
+        <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
+        <!--#endif -->
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />

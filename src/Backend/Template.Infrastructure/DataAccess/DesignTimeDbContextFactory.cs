@@ -8,7 +8,11 @@ namespace Template.Infrastructure.DataAccess;
 // para comandos que conectam (database update), defina ConnectionStrings__DbConnection.
 internal class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<TemplateDbContext>
 {
+#if (postgres)
     private const string ReferenceConnectionString = "Host=localhost;Port=5432;Database=Template";
+#else
+    private const string ReferenceConnectionString = "Server=localhost,1433;Database=Template;TrustServerCertificate=True";
+#endif
 
     public TemplateDbContext CreateDbContext(string[] args)
     {

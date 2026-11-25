@@ -7,8 +7,13 @@ namespace Template.Api.IntegrationTests.HealthChecks;
 
 public class HealthCheckTests(TemplateApplicationFactory factory) : IClassFixture<TemplateApplicationFactory>
 {
+#if (postgres)
     private const string UnreachableDatabase =
         "Host=127.0.0.1;Port=1;Database=template;Username=template;Password=x;Timeout=2";
+#else
+    private const string UnreachableDatabase =
+        "Server=127.0.0.1,1;Database=template;User Id=template;Password=x;Connect Timeout=2;TrustServerCertificate=True";
+#endif
 
     [Fact(DisplayName = nameof(Deve_RetornarHealthy_Quando_BancoEstiverDisponivel))]
     [Trait("Integration", "Health check")]
