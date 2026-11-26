@@ -65,13 +65,9 @@ public class TemplateApplicationFactory : WebApplicationFactory<Program>, IAsync
     }
 #endif
 
-    public async Task InitializeAsync() => await _database.StartAsync();
+    public async Task InitializeAsync() => await TestDatabase.StartServerAsync();
 
-    async Task IAsyncLifetime.DisposeAsync()
-    {
-        await base.DisposeAsync();
-        await _database.DisposeAsync();
-    }
+    async Task IAsyncLifetime.DisposeAsync() => await base.DisposeAsync();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

@@ -4,7 +4,7 @@ using Template.Infrastructure.DataAccess;
 
 namespace Template.Infrastructure.Tests;
 
-public sealed class DatabaseFixture : IAsyncLifetime, IAsyncDisposable
+public sealed class DatabaseFixture : IAsyncLifetime
 {
 #if (postgres)
     private const string CleanTablesSql = "TRUNCATE TABLE users CASCADE;";
@@ -16,14 +16,12 @@ public sealed class DatabaseFixture : IAsyncLifetime, IAsyncDisposable
 
     public async Task InitializeAsync()
     {
-        await _database.StartAsync();
+        await TestDatabase.StartServerAsync();
         await using var dbContext = CreateDbContext();
         await dbContext.Database.MigrateAsync();
     }
 
-    public async Task DisposeAsync() => await _database.DisposeAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => _database.DisposeAsync();
+    public Task DisposeAsync() => Task.CompletedTask;
 
     internal TemplateDbContext CreateDbContext()
     {
