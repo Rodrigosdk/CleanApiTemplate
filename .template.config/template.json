@@ -197,7 +197,8 @@
               "<!--#else"
             ],
             "elseif": [
-              "<!--#elseif"
+              "<!--#elseif",
+              "<!--#elif"
             ],
             "endif": [
               "<!--#endif"
@@ -220,7 +221,8 @@
               "<!--#else"
             ],
             "elseif": [
-              "<!--#elseif"
+              "<!--#elseif",
+              "<!--#elif"
             ],
             "endif": [
               "<!--#endif"
