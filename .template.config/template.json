@@ -48,7 +48,10 @@
             "**/bin/**",
             "**/obj/**",
             "**/TestResults/**",
-            "**/*.DotSettings.user"
+            "**/*.DotSettings.user",
+            "pack/**",
+            "artifacts/**",
+            ".github/workflows/publish.yml"
           ]
         },
         {

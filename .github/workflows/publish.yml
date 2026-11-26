@@ -1,0 +1,62 @@
+name: Publicar template
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Empacotar e publicar no nuget.org
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Instalar o .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Empacotar
+        run: |
+          VERSION_ARG=""
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION_ARG="-p:Version=${GITHUB_REF_NAME#v}"
+          fi
+          dotnet pack pack/Rodrigosdk.CleanApi.Templates.csproj --configuration Release --output artifacts $VERSION_ARG
+
+      - name: Validar o template empacotado
+        run: |
+          dotnet new install artifacts/*.nupkg
+          dotnet new cleanapi -n Smoke -o smoke
+          dotnet build smoke/Smoke.sln --configuration Release
+
+      - name: Obter chave temporária do nuget.org (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publicar no nuget.org
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate

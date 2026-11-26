@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageType>Template</PackageType>
+        <PackageId>Rodrigosdk.CleanApi.Templates</PackageId>
+        <Version>1.0.0</Version>
+        <Title>Clean Architecture Web API (.NET 10)</Title>
+        <Authors>Rodrigosdk</Authors>
+        <Description>Template do dotnet new (cleanapi) para Web API em Clean Architecture com .NET 10: PostgreSQL, SQL Server ou MySQL, autenticação JWT, logging e OpenTelemetry opcionais, ProblemDetails, Docker, CI e testes com Testcontainers.</Description>
+        <PackageTags>dotnet-new;templates;webapi;clean-architecture;efcore;postgresql;sqlserver;mysql;jwt;opentelemetry</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>TEMPLATE.md</PackageReadmeFile>
+
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeContentInPack>true</IncludeContentInPack>
+        <ContentTargetFolders>content</ContentTargetFolders>
+        <NoDefaultExcludes>true</NoDefaultExcludes>
+        <EnableDefaultItems>false</EnableDefaultItems>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <TemplateFile Include="..\**\*"
+                      Exclude="..\.git\**;..\.idea\**;..\.vs\**;..\pack\**;..\artifacts\**;..\**\bin\**;..\**\obj\**;..\**\TestResults\**;..\**\*.DotSettings.user" />
+        <None Include="..\TEMPLATE.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <Target Name="IncluirArquivosDoTemplate" BeforeTargets="_GetPackageFiles">
+        <ItemGroup>
+            <Content Include="@(TemplateFile)" Condition="'%(TemplateFile.Extension)' != ''"
+                     PackagePath="content\%(TemplateFile.RecursiveDir)%(TemplateFile.Filename)%(TemplateFile.Extension)" />
+            <Content Include="@(TemplateFile)" Condition="'%(TemplateFile.Extension)' == ''"
+                     PackagePath="content" />
+        </ItemGroup>
+    </Target>
+
+</Project>
