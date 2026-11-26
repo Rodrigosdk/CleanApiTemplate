@@ -98,7 +98,12 @@ git tag v1.1.0
 git push origin v1.1.0
 ```
 
-A versão do pacote vem da tag. O workflow usa o secret `NUGET_API_KEY` do repositório.
+A versão do pacote vem da tag. A publicação usa o Trusted Publishing do nuget.org: o workflow troca o token OIDC do GitHub por uma chave temporária (válida por 1 hora), sem API key guardada no repositório. Para isso, existem:
+
+- no nuget.org, em **Trusted Publishing**, uma política com o dono `Rodrigosdk`, o repositório `CleanApiTemplate` e o workflow `publish.yml`;
+- no repositório, o secret `NUGET_USER` com o nome de perfil do nuget.org (não o e-mail).
+
+Em repositório privado, a política fica ativa por 7 dias até a primeira publicação; depois disso, vira permanente. Se expirar antes, reative-a no nuget.org.
 
 Para testar o pacote localmente antes de publicar:
 
