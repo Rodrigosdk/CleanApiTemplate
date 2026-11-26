@@ -46,22 +46,22 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restaurar dependências
-        run: dotnet restore Template.sln
+        run: dotnet restore Template.slnx
 
       - name: Verificar pacotes vulneráveis
         run: |
-          dotnet list Template.sln package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+          dotnet list Template.slnx package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
           if grep -q "has the following vulnerable packages\|tem os seguintes pacotes vulneráveis" vulnerable.txt; then
             echo "::error::Foram encontrados pacotes NuGet com vulnerabilidades conhecidas."
             exit 1
           fi
 
       - name: Build
-        run: dotnet build Template.sln --configuration Release --no-restore
+        run: dotnet build Template.slnx --configuration Release --no-restore
 
       - name: Testes (unitários e de integração)
         run: >
-          dotnet test Template.sln
+          dotnet test Template.slnx
           --configuration Release
           --no-build
           --logger "trx;LogFilePrefix=results"

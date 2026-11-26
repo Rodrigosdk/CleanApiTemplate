@@ -46,7 +46,7 @@ jobs:
         run: |
           dotnet new install artifacts/*.nupkg
           dotnet new cleanapi -n Smoke -o smoke
-          dotnet build smoke/Smoke.sln --configuration Release
+          dotnet build smoke/Smoke.slnx --configuration Release
 
       - name: Obter chave temporária do nuget.org (Trusted Publishing)
         id: login

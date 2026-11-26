@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Backend/">
+    <Project Path="src/Backend/Template.Api/Template.Api.csproj" />
+    <Project Path="src/Backend/Template.Application/Template.Application.csproj" />
+    <Project Path="src/Backend/Template.Domain/Template.Domain.csproj" />
+    <Project Path="src/Backend/Template.Infrastructure/Template.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Template.Communication/Template.Communication.csproj" />
+    <Project Path="src/Shared/Template.Exception/Template.Exception.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/src/">
+    <Project Path="tests/src/CommonTestUtilities/CommonTestUtilities.csproj" />
+    <Project Path="tests/src/Template.Api.IntegrationTests/Template.Api.IntegrationTests.csproj" />
+    <Project Path="tests/src/Template.Application.Tests/Template.Application.Tests.csproj" />
+    <Project Path="tests/src/Template.Domain.Tests/Template.Domain.Tests.csproj" />
+    <Project Path="tests/src/Template.Infrastructure.Tests/Template.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
