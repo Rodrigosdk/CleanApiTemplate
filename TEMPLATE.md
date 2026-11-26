@@ -83,3 +83,8 @@ Siga o caminho do `User`:
 6. `Api/Controllers` – controller recebendo o use case por `[FromServices]`.
 7. Testes nos quatro projetos, com builders e mocks em `CommonTestUtilities`.
 
+## Manter o template
+
+- Ao mudar o modelo de `User`, atualize as três migrations: a da fonte (PostgreSQL) com `dotnet ef migrations add`, e as de SQL Server e MySQL gerando um projeto com `--database sqlserver`/`mysql`, rodando o mesmo comando nele e copiando os arquivos para `.template.config/migrations/<banco>/`, trocando o nome do projeto por `Template`.
+- Mensagem nova no `.resx` também vai no `ResourcesMessageException.Designer.cs`. Se o Rider regenerar o Designer, ele perde os blocos `#if (auth)`; recoloque-os.
+- Antes de publicar uma mudança, gere e teste as variantes (`dotnet new cleanapi -n X --database ...`), porque a fonte só exercita a combinação padrão.
