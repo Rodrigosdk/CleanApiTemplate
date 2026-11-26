@@ -1,12 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 #if (auth)
-#if (postgres)
-using Npgsql;
-#elif (sqlserver)
-using Microsoft.Data.SqlClient;
-#else
-using MySql.Data.MySqlClient;
-#endif
 using Template.Infrastructure.DataAccess.Mappings;
 #endif
 using Template.Domain.Repositories;
@@ -48,13 +41,13 @@ internal class UnitOfWork(TemplateDbContext dbContext) : IUnitOfWork
 
     private static bool IsUniqueViolation(DbUpdateException exception, string indexName) =>
 #if (postgres)
-        exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } postgresException &&
+        exception.InnerException is Npgsql.PostgresException { SqlState: Npgsql.PostgresErrorCodes.UniqueViolation } postgresException &&
         postgresException.ConstraintName == indexName;
 #elif (sqlserver)
-        exception.InnerException is SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } sqlException &&
+        exception.InnerException is Microsoft.Data.SqlClient.SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } sqlException &&
         sqlException.Message.Contains(indexName, StringComparison.Ordinal);
 #else
-        exception.InnerException is MySqlException { Number: DuplicateEntry } mySqlException &&
+        exception.InnerException is MySql.Data.MySqlClient.MySqlException { Number: DuplicateEntry } mySqlException &&
         mySqlException.Message.Contains(indexName, StringComparison.Ordinal);
 #endif
 #endif
