@@ -9,10 +9,10 @@ A fonte do template é a variante padrão (PostgreSQL, com tudo ligado) e compil
 ## Instalar
 
 ```bash
-dotnet new install ~/RiderProjects/CleanApiTemplate
+dotnet new install Rodrigosdk.CleanApi.Templates
 ```
 
-Depois de alterar o template, rode o mesmo comando com `--force` para atualizar a instalação. Para remover: `dotnet new uninstall ~/RiderProjects/CleanApiTemplate`.
+Para atualizar para a versão mais nova: `dotnet new update`. Para remover: `dotnet new uninstall Rodrigosdk.CleanApi.Templates`.
 
 ## Criar um projeto
 
@@ -88,3 +88,21 @@ Siga o caminho do `User`:
 - Ao mudar o modelo de `User`, atualize as três migrations: a da fonte (PostgreSQL) com `dotnet ef migrations add`, e as de SQL Server e MySQL gerando um projeto com `--database sqlserver`/`mysql`, rodando o mesmo comando nele e copiando os arquivos para `.template.config/migrations/<banco>/`, trocando o nome do projeto por `Template`.
 - Mensagem nova no `.resx` também vai no `ResourcesMessageException.Designer.cs`. Se o Rider regenerar o Designer, ele perde os blocos `#if (auth)`; recoloque-os.
 - Antes de publicar uma mudança, gere e teste as variantes (`dotnet new cleanapi -n X --database ...`), porque a fonte só exercita a combinação padrão.
+
+## Publicar uma nova versão
+
+O pacote é gerado pelo `pack/Rodrigosdk.CleanApi.Templates.csproj` e publicado no nuget.org pelo workflow `publish.yml`, que roda o CI, empacota, gera um projeto de teste a partir do pacote e faz o push. Nem a pasta `pack` nem esse workflow vão para os projetos gerados.
+
+```bash
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+A versão do pacote vem da tag. O workflow usa o secret `NUGET_API_KEY` do repositório.
+
+Para testar o pacote localmente antes de publicar:
+
+```bash
+dotnet pack pack/Rodrigosdk.CleanApi.Templates.csproj -c Release -o artifacts
+dotnet new install ./artifacts/Rodrigosdk.CleanApi.Templates.1.0.0.nupkg --force
+```
